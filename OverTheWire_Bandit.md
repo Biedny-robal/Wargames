@@ -51,3 +51,44 @@ file ./inhere/* | grep -e 'ASCII text' | head -c 16 | xargs cat
 ```
 here we are assuming that we know the full name of the file is exactly 16 bytes, this can change, but accounting for it in a one line seems pretty annoying, so I'll skip it, doing it in two lines is trivial.
 ### Level 5
+Here the whole level is solved using the "find" command, as following:
+```
+find -type f -size 1033c | xargs cat | head -c 32
+```
+after we find the file, we take the first 32 characters, which are the password
+### Level 6
+Same as before, we have to use the find command. This time, there will be some permission errors, this is expected.
+```
+find / -group bandit6 -user bandit7 -size 33c | xargs cat
+```
+### Level 7
+The password is stored in the file data.txt next to the word millionth, we use the grep command to get the line with the password, and extract it using tail (end of line):
+```
+grep -e "millionth" data.txt | tail -c 33
+```
+### Level 8
+The password is stored in the only non-repeating line of the data.txt file.
+
+We start by sorting the lines in the file, then passing it to the uniq function that counts how many times each line occurs, filtering to only 1 occurence using grep, and finally taking only the password using tail;
+```
+sort data.txt | uniq -c | grep '1 '|tail -c 33
+```
+### Level 9
+The password is stored in the file data.txt in one of the few human-readable strings, preceded by several ‘=’ characters.
+
+We check for human readability using "strings" then pass to grep to check for more than 1 equal sign;
+```
+strings -a data.txt | grep -E ^==+
+```
+### Level 10
+this time the password is written in plain text, but file is base64 encoded:
+```
+base64 -d data.txt | tail -c 33
+```
+### Level 11
+The password is in the file data.txt, where all lowercase (a-z) and uppercase (A-Z) letters have been rotated by 13 positions
+
+To decode we will substitude using tr. We need to first cat, to pipe the contents of the file into tr, and then we use tail to extract the password.
+```
+cat data.txt | tr 'A-Za-z' 'N-ZA-Mn-za-m' | tail -c 33
+```
