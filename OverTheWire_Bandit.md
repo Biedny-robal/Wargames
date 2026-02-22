@@ -92,3 +92,40 @@ To decode we will substitude using tr. We need to first cat, to pipe the content
 ```
 cat data.txt | tr 'A-Za-z' 'N-ZA-Mn-za-m' | tail -c 33
 ```
+### Level 12
+This time the password is in a hexdump file that has been compressed a number of times.
+
+First step is to de-hexdump, using xxd;
+```
+xxd -r data.txt
+```
+then we decompress using one of three commands:
+```
+gunzip file.gz
+bunzip2 file
+tar -x -f file
+```
+until we reach a file called "data8", it contains the password, in plain text.
+### Level 13
+This time we have the ssh private key for the 14th level, but can only get the password after we log into the 14 level using the key.
+
+First, we scp the key onto our machine using the following:
+```
+scp -P 2220 bandit13@bandit.labs.overthewire.org:/home/bandit13/sshkey.private ./sshkey.private
+```
+next, we change the permissions for the key and ssh in using it;
+```
+chmod 600 sshkey.private
+ssh -l bandit14 -p 2220 -i sshkey.private bandit.labs.overthewire.org
+```
+and now we can cat the password for the 14 level:
+```
+cat /etc/bandit_pass/bandit14
+```
+### Level 14
+This time we are asked to send the password to level 14 to localhost on port 30000, in order to receive the password to the next level. We can do this with the command:
+```
+telnet -a localhost 30000
+```
+This opens the interface, we then paste the password in, and after a delay, we receive the new password back.
+### Level 15
